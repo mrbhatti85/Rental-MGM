@@ -33,7 +33,10 @@ body { background: var(--bg); color: var(--text); }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #172554, #2563eb);
+  background-image: linear-gradient(rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.42)), url('bahrain-skyline.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 .login-card {
   background: var(--card);
