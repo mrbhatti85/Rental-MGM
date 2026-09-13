@@ -49,6 +49,50 @@
       }];
     }
     if (!store.settings) store.settings = [];
+    if (!store.buildings || !store.buildings.length) {
+      const month = new Date().toISOString().slice(0, 7);
+      const date = new Date().toISOString().slice(0, 10);
+      store.buildings = Array.from({ length: 5 }, (_, index) => ({
+        id: `demo-building-${index + 1}`,
+        name: `Demo Building ${index + 1}`,
+        address: `Road ${index + 1}, Manama`,
+      }));
+      store.flats = store.buildings.map((building, index) => ({
+        id: `demo-flat-${index + 1}`,
+        buildingId: building.id,
+        unit: `${index + 1}01`,
+        tenant: `Demo Tenant ${index + 1}`,
+        phone: `+973 3600 00${String(index + 1).padStart(2, '0')}`,
+        rent: 350 + index * 50,
+      }));
+      store.expenses = store.flats.map((flat, index) => ({
+        id: `demo-expense-${index + 1}`,
+        flatId: flat.id,
+        category: 'Maintenance',
+        amount: 25 + index * 10,
+        date,
+        note: 'Demo maintenance expense',
+      }));
+      store.rentRecords = store.flats.map((flat, index) => ({
+        id: `demo-rent-${index + 1}`,
+        flatId: flat.id,
+        month,
+        amountDue: flat.rent,
+        received: index % 2 === 0,
+        receivedDate: index % 2 === 0 ? date : '',
+        paymentMode: index % 2 === 0 ? 'Bank transfer' : '',
+        note: 'Demo rent record',
+      }));
+      store.advancePayments = store.flats.map((flat, index) => ({
+        id: `demo-advance-${index + 1}`,
+        flatId: flat.id,
+        amount: 100 + index * 25,
+        date,
+        paymentMode: 'Cash',
+        note: 'Demo advance payment',
+      }));
+    }
+    if (!store.activityLog) store.activityLog = [];
     writeStore(store);
   }
 
