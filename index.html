@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bahrain Rental Management</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">Bahrain<span>Rental</span></div>
+    <nav>
+      <button class="nav-item active" data-view="dashboard">Dashboard</button>
+      <button class="nav-item" data-view="buildings">Buildings</button>
+      <button class="nav-item" data-view="flats">Flats</button>
+      <button class="nav-item" data-view="rent">Rent Collection</button>
+      <button class="nav-item" data-view="advance">Advance Payments</button>
+      <button class="nav-item" data-view="expenses">Expenses</button>
+      <button class="nav-item" data-view="report">Monthly Report</button>
+      <button class="nav-item" data-view="admin" id="adminNavItem">Admin</button>
+      <button class="nav-item" data-view="smtp" id="smtpNavItem">SMTP Setup</button>
+      <button class="nav-item" data-view="activity" id="activityNavItem">Activity Log</button>
+    </nav>
+    <div class="current-user" id="currentUserBox"></div>
+    <button class="logout-btn" id="logoutBtn">Log Out</button>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="topbar">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu">☰</button>
+      <h2 id="pageTitle">Dashboard</h2>
+    </header>
+
+    <!-- DASHBOARD VIEW -->
+    <section class="view active" id="view-dashboard">
+      <div class="stat-grid compact">
+        <div class="stat-card">
+          <span class="stat-value" id="statBuildings">0</span>
+          <span class="stat-label">Buildings</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="statFlats">0</span>
+          <span class="stat-label">Flats</span>
+        </div>
+      </div>
+
+      <div id="buildingSections"></div>
+      <p class="empty-msg" id="buildingSectionsEmpty" hidden>No buildings added yet.</p>
+    </section>
+
+    <!-- BUILDINGS VIEW -->
+    <section class="view" id="view-buildings">
+      <div class="panel-box narrow">
+        <h3 id="buildingFormTitle">Add Building</h3>
+        <form id="buildingForm">
+          <input type="hidden" id="buildingEditId">
+          <label>Building Name
+            <input type="text" id="buildingName" required>
+          </label>
+          <label>Address
+            <input type="text" id="buildingAddress" required>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="buildingSubmitBtn">Add Building</button>
+            <button type="button" class="action-btn" id="buildingCancelEdit" hidden>Cancel</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel-box">
+        <div class="section-header-row">
+          <h3>All Buildings</h3>
+          <button type="button" class="action-btn" id="exportBuildingsCsv">Export CSV</button>
+        </div>
+        <div class="table-scroll">
+        <table class="data-table" id="buildingsTable">
+          <thead><tr><th>Name</th><th>Address</th><th>Flats</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        </div>
+        <p class="empty-msg" id="buildingsEmpty" hidden>No buildings added yet.</p>
+      </div>
+    </section>
+
+    <!-- FLATS VIEW -->
+    <section class="view" id="view-flats">
+      <div class="panel-box narrow">
+        <h3 id="flatFormTitle">Add Flat</h3>
+        <form id="flatForm">
+          <input type="hidden" id="flatEditId">
+          <label>Building
+            <select id="flatBuilding" required></select>
+          </label>
+          <label>Unit Number
+            <input type="text" id="flatUnit" placeholder="e.g. 101" required>
+          </label>
+          <label>Tenant Name
+            <input type="text" id="flatTenant" placeholder="Leave blank if vacant">
+          </label>
+          <label>Tenant Phone
+            <input type="tel" id="flatPhone">
+          </label>
+          <label>Monthly Rent
+            <input type="number" id="flatRent" min="0" step="0.01" required>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="flatSubmitBtn">Add Flat</button>
+            <button type="button" class="action-btn" id="flatCancelEdit" hidden>Cancel</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel-box">
+        <div class="log-toolbar">
+          <select id="flatBuildingFilter">
+            <option value="all">All Buildings</option>
+          </select>
+          <button type="button" class="action-btn" id="exportFlatsCsv">Export CSV</button>
+        </div>
+        <h3>All Flats</h3>
+        <div class="table-scroll">
+        <table class="data-table" id="flatsTable">
+          <thead>
+            <tr>
+              <th>Building</th><th>Unit</th><th>Tenant</th><th>Status</th>
+              <th>Monthly Rent</th><th>Total Expenses</th><th>Advance Held</th><th>Net</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        </div>
+        <p class="empty-msg" id="flatsEmpty" hidden>No flats added yet.</p>
+      </div>
+    </section>
+
+    <!-- EXPENSES VIEW -->
+    <section class="view" id="view-expenses">
+      <div class="panel-box narrow">
+        <h3 id="expenseFormTitle">Add Expense</h3>
+        <form id="expenseForm">
+          <input type="hidden" id="expenseEditId">
+          <label>Building
+            <select id="expenseBuilding"></select>
+          </label>
+          <label>Flat
+            <select id="expenseFlat" required></select>
+          </label>
+          <label>Category
+            <select id="expenseCategory" required>
+              <option>Electricity</option>
+              <option>Water</option>
+              <option>Maintenance</option>
+              <option>Cleaning</option>
+              <option>Municipality Fees</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label>Amount
+            <input type="number" id="expenseAmount" min="0" step="0.01" required>
+          </label>
+          <label>Date
+            <input type="date" id="expenseDate" required>
+          </label>
+          <label>Note
+            <input type="text" id="expenseNote" placeholder="Optional">
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="expenseSubmitBtn">Add Expense</button>
+            <button type="button" class="action-btn" id="expenseCancelEdit" hidden>Cancel</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel-box">
+        <div class="log-toolbar">
+          <select id="expenseBuildingFilter">
+            <option value="all">All Buildings</option>
+          </select>
+          <input type="month" id="expenseMonthFilter">
+          <button type="button" class="action-btn" id="expenseMonthFilterClear">Clear Month Filter</button>
+          <button type="button" class="action-btn" id="exportExpensesCsv">Export CSV</button>
+        </div>
+        <h3>All Expenses</h3>
+        <div class="table-scroll">
+        <table class="data-table" id="expensesTable">
+          <thead>
+            <tr><th>Date</th><th>Building</th><th>Flat</th><th>Category</th><th>Amount</th><th>Note</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        </div>
+        <p class="empty-msg" id="expensesEmpty" hidden>No expenses recorded yet.</p>
+      </div>
+    </section>
+
+    <!-- RENT COLLECTION VIEW -->
+    <section class="view" id="view-rent">
+      <div class="panel-box narrow">
+        <h3 id="rentFormTitle">Add Rent Record</h3>
+        <form id="rentForm">
+          <input type="hidden" id="rentEditId">
+          <label>Building
+            <select id="rentBuilding"></select>
+          </label>
+          <label>Flat
+            <select id="rentFlat" required></select>
+          </label>
+          <label>Month
+            <input type="month" id="rentMonth" required>
+          </label>
+          <label>Amount Due
+            <input type="number" id="rentAmount" min="0" step="0.01" required>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="rentReceived">
+            Rent Received
+          </label>
+          <label>Date Received
+            <input type="date" id="rentReceivedDate">
+          </label>
+          <label>Payment Mode
+            <select id="rentPaymentMode">
+              <option value="">—</option>
+              <option>Bank Transfer</option>
+              <option>Cash</option>
+              <option>Cheque</option>
+            </select>
+          </label>
+          <label>Note
+            <input type="text" id="rentNote" placeholder="Optional">
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="rentSubmitBtn">Add Rent Record</button>
+            <button type="button" class="action-btn" id="rentCancelEdit" hidden>Cancel</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel-box">
+        <div class="log-toolbar">
+          <select id="rentBuildingFilter">
+            <option value="all">All Buildings</option>
+          </select>
+          <input type="month" id="rentMonthFilter">
+          <button type="button" class="action-btn" id="rentMonthFilterClear">Clear Month Filter</button>
+          <button type="button" class="action-btn" id="exportRentCsv">Export CSV</button>
+        </div>
+        <h3>All Rent Records</h3>
+        <div class="table-scroll">
+        <table class="data-table" id="rentTable">
+          <thead>
+            <tr>
+              <th>Building</th><th>Unit</th><th>Tenant</th><th>Month</th><th>Amount Due</th>
+              <th>Received</th><th>Date Received</th><th>Payment Mode</th><th>Note</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        </div>
+        <p class="empty-msg" id="rentEmpty" hidden>No rent records yet.</p>
+      </div>
+    </section>
+
+    <!-- ADVANCE PAYMENTS VIEW -->
+    <section class="view" id="view-advance">
+      <div class="panel-box narrow">
+        <h3 id="advanceFormTitle">Add Advance Payment</h3>
+        <form id="advanceForm">
+          <input type="hidden" id="advanceEditId">
+          <label>Building
+            <select id="advanceBuilding"></select>
+          </label>
+          <label>Flat
+            <select id="advanceFlat" required></select>
+          </label>
+          <label>Amount
+            <input type="number" id="advanceAmount" min="0" step="0.01" required>
+          </label>
+          <label>Date Received
+            <input type="date" id="advanceDate" required>
+          </label>
+          <label>Payment Mode
+            <select id="advancePaymentMode">
+              <option value="">—</option>
+              <option>Bank Transfer</option>
+              <option>Cash</option>
+              <option>Cheque</option>
+            </select>
+          </label>
+          <label>Note
+            <input type="text" id="advanceNote" placeholder="e.g. Security deposit, 2 months advance rent">
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="advanceSubmitBtn">Add Advance Payment</button>
+            <button type="button" class="action-btn" id="advanceCancelEdit" hidden>Cancel</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel-box">
+        <div class="log-toolbar">
+          <select id="advanceBuildingFilter">
+            <option value="all">All Buildings</option>
+          </select>
+          <button type="button" class="action-btn" id="exportAdvanceCsv">Export CSV</button>
+        </div>
+        <h3>All Advance Payments</h3>
+        <div class="table-scroll">
+        <table class="data-table" id="advanceTable">
+          <thead>
+            <tr><th>Building</th><th>Unit</th><th>Tenant</th><th>Date</th><th>Amount</th><th>Payment Mode</th><th>Note</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        </div>
+        <p class="empty-msg" id="advanceEmpty" hidden>No advance payments recorded yet.</p>
+      </div>
+    </section>
+
+    <!-- MONTHLY REPORT VIEW -->
+    <section class="view" id="view-report">
+      <button type="button" class="btn btn-primary pdf-btn" id="downloadReportPdf">Download PDF</button>
+      <div id="reportSections"></div>
+      <p class="empty-msg" id="reportEmpty" hidden>No buildings added yet.</p>
+    </section>
+
+    <!-- ADMIN VIEW -->
+    <section class="view" id="view-admin">
+      <div class="panel-box narrow">
+        <h3 id="userFormTitle">Add Account</h3>
+        <form id="userForm">
+          <input type="hidden" id="userEditId">
+          <label>Full Name
+            <input type="text" id="userFullName" required>
+          </label>
+          <label>Username
+            <input type="text" id="userUsername" required>
+          </label>
+          <label>Email
+            <input type="email" id="userEmail" required>
+          </label>
+          <label>Password
+            <input type="text" id="userPassword" required>
+          </label>
+          <label>Role
+            <select id="userRole" required>
+              <option value="editor">Editor (can add/edit/delete)</option>
+              <option value="viewer">Viewer (view only)</option>
+              <option value="admin" id="userRoleAdminOption" hidden>Admin</option>
+            </select>
+          </label>
+          <p class="form-error" id="userFormError" hidden></p>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="userSubmitBtn">Create Account</button>
+            <button type="button" class="action-btn" id="userCancelEdit" hidden>Cancel</button>
+          </div>
+        </form>
+      </div>
+      <div class="panel-box">
+        <h3>Accounts</h3>
+        <div class="table-scroll">
+        <table class="data-table" id="usersTable">
+          <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        </div>
+      </div>
+      <div class="panel-box narrow">
+        <h3>Backup &amp; Restore</h3>
+        <p class="empty-msg" style="text-align:left; padding:0 0 14px;">Backup downloads everything (buildings, flats, expenses, rent, advance, accounts) as one JSON file. Restoring a backup replaces all current data.</p>
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary" id="downloadBackup">Download Backup</button>
+          <label class="action-btn" id="restoreLabel" style="cursor:pointer;">
+            Restore from Backup
+            <input type="file" id="restoreFileInput" accept="application/json" hidden>
+          </label>
+        </div>
+      </div>
+      <div class="panel-box narrow">
+        <h3>Summary Report</h3>
+        <p class="empty-msg" style="text-align:left; padding:0 0 14px;">Emails an overview of every building and flat — rent, expenses, net, and this month's collection status — to the address set up in SMTP Setup.</p>
+        <p class="form-error" id="summaryReportError" hidden></p>
+        <p class="form-success" id="summaryReportSuccess" hidden></p>
+        <button type="button" class="btn btn-primary" id="sendSummaryReport">Send Summary Report Now</button>
+      </div>
+    </section>
+
+    <!-- EMAIL NOTIFICATIONS VIEW -->
+    <section class="view" id="view-smtp">
+      <div class="panel-box narrow">
+        <h3>Email Notifications</h3>
+        <p class="empty-msg" style="text-align:left; padding:0 0 14px;">
+          Sends an email (via Web3Forms, no server required) whenever a building, flat, expense, rent record, or advance payment is added, edited, or deleted.
+          Go to <strong>web3forms.com</strong>, enter the email address that should receive notifications, and it emails you an Access Key instantly — no account needed. Paste that key below.
+        </p>
+        <form id="smtpForm">
+          <label class="checkbox-label">
+            <input type="checkbox" id="smtpEnabled">
+            Enable email notifications
+          </label>
+          <label>Web3Forms Access Key
+            <input type="text" id="smtpAccessKey" required>
+          </label>
+          <p class="form-error" id="smtpFormError" hidden></p>
+          <p class="form-success" id="smtpFormSuccess" hidden></p>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+            <button type="button" class="action-btn" id="smtpSendTest">Send Test Email</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ACTIVITY LOG VIEW -->
+    <section class="view" id="view-activity">
+      <div class="panel-box">
+        <h3>Activity Log</h3>
+        <p class="empty-msg" style="text-align:left; padding:0 0 14px;">Shows the most recent 200 changes across the whole system.</p>
+        <div class="table-scroll">
+        <table class="data-table" id="activityTable">
+          <thead><tr><th>Time</th><th>Section</th><th>Action</th><th>Details</th><th>By</th><th>Email</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        </div>
+        <p class="empty-msg" id="activityEmpty" hidden>No activity recorded yet.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="users.js"></script>
+<script src="vendor/chart.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
