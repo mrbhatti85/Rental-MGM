@@ -41,6 +41,15 @@ function showSyncError(message) {
   banner.hidden = false;
 }
 
+const flatBuildingSelect = document.getElementById('flatBuilding');
+const flatBuildingFilter = document.getElementById('flatBuildingFilter');
+const expenseBuildingSelect = document.getElementById('expenseBuilding');
+const expenseBuildingFilter = document.getElementById('expenseBuildingFilter');
+const rentBuildingSelect = document.getElementById('rentBuilding');
+const rentBuildingFilter = document.getElementById('rentBuildingFilter');
+const advanceBuildingSelect = document.getElementById('advanceBuilding');
+const advanceBuildingFilter = document.getElementById('advanceBuildingFilter');
+
 function watchCollection(name, onData) {
   db.collection(name).onSnapshot(
     snap => onData(snap.docs.map(d => ({ id: d.id, ...d.data() }))),

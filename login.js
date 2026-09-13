@@ -37,11 +37,7 @@ loginForm.addEventListener('submit', async (e) => {
       loginError.hidden = false;
     }
   } catch (err) {
-    if (err.code === 'permission-denied') {
-      loginError.textContent = 'Firestore is blocking access. Go to Firebase Console → Firestore Database → Rules and publish the rules from firestore.rules.';
-    } else {
-      loginError.textContent = 'Could not reach the database: ' + err.message;
-    }
+    loginError.textContent = 'Could not load the app data: ' + err.message;
     loginError.hidden = false;
   } finally {
     submitBtn.disabled = false;
