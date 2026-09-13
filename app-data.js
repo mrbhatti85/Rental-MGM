@@ -110,10 +110,10 @@
       onSnapshot(next, onError) {
         try {
           const items = readCollection(name);
-          next({
+          Promise.resolve().then(() => next({
             empty: items.length === 0,
             docs: items.map(item => buildSnapshot(item)),
-          });
+          }));
         } catch (err) {
           if (onError) onError(err);
         }

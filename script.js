@@ -174,15 +174,6 @@ const buildingCancelEdit = document.getElementById('buildingCancelEdit');
 const buildingsTableBody = document.querySelector('#buildingsTable tbody');
 const buildingsEmpty = document.getElementById('buildingsEmpty');
 
-const flatBuildingSelect = document.getElementById('flatBuilding');
-const flatBuildingFilter = document.getElementById('flatBuildingFilter');
-const expenseBuildingSelect = document.getElementById('expenseBuilding');
-const expenseBuildingFilter = document.getElementById('expenseBuildingFilter');
-const rentBuildingSelect = document.getElementById('rentBuilding');
-const rentBuildingFilter = document.getElementById('rentBuildingFilter');
-const advanceBuildingSelect = document.getElementById('advanceBuilding');
-const advanceBuildingFilter = document.getElementById('advanceBuildingFilter');
-
 function resetBuildingForm() {
   buildingForm.reset();
   buildingEditIdInput.value = '';
